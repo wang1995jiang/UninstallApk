@@ -18,10 +18,33 @@
         </LinearLayout>
     </ScrollView>
 
-    <Button
-        android:id="@+id/start_delete"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_weight="1"
-        android:text="一键卸载"/>
+        android:orientation="horizontal"
+        android:layout_weight="1">
+
+        <Button
+            android:id="@+id/no_silent"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="卸载"/>
+
+        <Button
+            android:id="@+id/cancel_choice"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="取消选择"/>
+
+        <Button
+            android:id="@+id/start_delete"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="一键卸载"/>
+    </LinearLayout>
+
+
 </LinearLayout>

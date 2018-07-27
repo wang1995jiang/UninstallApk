@@ -1,8 +1,10 @@
 package com.example.uninstallapk;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,12 +20,18 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     LinearLayout linearLayout;
 
+    Button button,cancel,noSilent;
+
     List<Integer> pages=new ArrayList<>();
+    List<Integer> pagesCancels=new ArrayList<>();
     List<View> views=new ArrayList<>();
+    List<CheckBox> checkBoxes=new ArrayList<>();
+
+    int number=0;
 
     ProgressDialog progressDialog;
 
@@ -36,8 +44,9 @@ public class MainActivity extends AppCompatActivity {
 
         linearLayout = (LinearLayout) findViewById(R.id.linear1);
 
-        Button button=(Button) findViewById(R.id.start_delete);
-
+        button=(Button) findViewById(R.id.start_delete);
+        cancel=(Button) findViewById(R.id.cancel_choice);
+        noSilent=(Button) findViewById(R.id.no_silent);
 
         PackageManager packageManager=getPackageManager();
         packageInfos=packageManager.getInstalledPackages(PackageManager.GET_UNINSTALLED_PACKAGES);
@@ -49,13 +58,9 @@ public class MainActivity extends AppCompatActivity {
             id++;
         }
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                new DEleteApk().execute();
-            }
-        });
+        button.setOnClickListener(this);
+        cancel.setOnClickListener(this);
+        noSilent.setOnClickListener(this);
     }
 
     private View getChoiceView(LinearLayout root, final String pageName, int id){
@@ -76,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
                     views.add((View) checkBox.getTag());
                     pages.add((int) view.getTag());
+                    pagesCancels.add((int) view.getTag());
 
                 }else {
 
@@ -87,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        checkBoxes.add(checkBox);
 
         textView.setText(pageName);
 
@@ -106,6 +114,58 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return index;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.start_delete:
+                new DEleteApk().execute();
+                break;
+            case R.id.cancel_choice:
+
+                for (int i:pagesCancels){
+                    checkBoxes.get(i).setChecked(false);
+                }
+
+                pagesCancels.removeAll(pagesCancels);
+                break;
+            case R.id.no_silent:
+
+                for (int i:pages){
+                    unstallApp(packageInfos.get(i).packageName);
+                    number++;
+                }
+                break;
+        }
+    }
+
+
+    public void unstallApp(String pageName){
+        Intent uninstall_intent = new Intent();
+        uninstall_intent.setAction(Intent.ACTION_DELETE);
+        uninstall_intent.setData(Uri.parse("package:"+pageName));
+        startActivityForResult(uninstall_intent,1);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode==1){
+            if (resultCode==0){
+                if (pages.size()==number){
+
+                    pages.removeAll(pages);
+                    number=0;
+
+                    for (View view:views){
+                        linearLayout.removeView(view);
+                    }
+                    views.removeAll(views);
+
+                }
+            }
+        }
     }
 
     class DEleteApk extends AsyncTask {
