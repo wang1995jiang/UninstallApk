@@ -25,6 +25,12 @@
         android:layout_weight="1">
 
         <Button
+            android:id="@+id/search_id"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="搜索"/>
+        <Button
             android:id="@+id/no_silent"
             android:layout_width="1dp"
             android:layout_height="match_parent"
